@@ -12,14 +12,25 @@ from linear_search_rust import linear_search_rust_noboundscheck as rust
 @pytest.mark.parametrize("f", [cython, numba, pure, rust])
 @pytest.mark.parametrize("n1", [0, 1, 1000, 1_000_000])
 @pytest.mark.parametrize("n2", [0, 1, 1000, 1_000_000])
-def test_linear_search(benchmark, f, n1, n2):
+def test_random(benchmark, f, n1, n2):
     benchmark.group = f'{n1 = }, {n2 = }'
 
     rng = np.random.default_rng(n1 + n2)
     a = np.sort(rng.normal(0, 1, size=n1))
     b = np.sort(rng.normal(0, 1, size=n2))
 
-    expected = np.searchsorted(a, b)
+    expected = np.searchsorted(a, b, side='right')
     actual = benchmark(f, a, b)
+
+    assert_array_equal(actual, expected)
+
+
+@pytest.mark.parametrize("f", [cython, numba, pure, rust])
+def test_right_side(f):
+    a = np.arange(10.0)
+    b = np.linspace(-10.0, 10.0, 201)
+
+    expected = np.searchsorted(a, b, side='right')
+    actual = f(a, b)
 
     assert_array_equal(actual, expected)
