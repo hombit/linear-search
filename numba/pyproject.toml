@@ -1,0 +1,4 @@
+[project]
+name = "linear_search_numba"
+version = "0.1.0"
+dependencies = ["numba", "numpy"]
